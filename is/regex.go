@@ -1,4 +1,4 @@
-package datacop
+package is
 
 import "regexp"
 

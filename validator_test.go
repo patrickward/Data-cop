@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/patrickward/datacop"
+	"github.com/patrickward/datacop/is"
 )
 
 func TestValidator_BasicValidation(t *testing.T) {
@@ -24,7 +25,7 @@ func TestValidator_BasicValidation(t *testing.T) {
 			name:         "valid required string",
 			field:        "username",
 			value:        "johndoe",
-			validationFn: datacop.Required,
+			validationFn: is.Required,
 			message:      "username is required",
 			expectError:  false,
 		},
@@ -32,7 +33,7 @@ func TestValidator_BasicValidation(t *testing.T) {
 			name:          "invalid required string",
 			field:         "username",
 			value:         "",
-			validationFn:  datacop.Required,
+			validationFn:  is.Required,
 			message:       "username is required",
 			expectError:   true,
 			expectedError: "username is required",
@@ -41,7 +42,7 @@ func TestValidator_BasicValidation(t *testing.T) {
 			name:         "valid email",
 			field:        "email",
 			value:        "test@example.com",
-			validationFn: datacop.Email,
+			validationFn: is.Email,
 			message:      "invalid email format",
 			expectError:  false,
 		},
@@ -49,7 +50,7 @@ func TestValidator_BasicValidation(t *testing.T) {
 			name:          "invalid email",
 			field:         "email",
 			value:         "not-an-email",
-			validationFn:  datacop.Email,
+			validationFn:  is.Email,
 			message:       "invalid email format",
 			expectError:   true,
 			expectedError: "invalid email format",
@@ -181,9 +182,9 @@ func TestValidator_ValidationChaining(t *testing.T) {
 			name: "single field multiple validations",
 			validate: func() {
 				v.Field("password", "weak123").
-					Check(datacop.Required("weak123"), "password required").
-					Check(datacop.MinLength(8)("weak123"), "password too short").
-					Check(datacop.Match(`[A-Z]`)("weak123"), "needs uppercase")
+					Check(is.Required("weak123"), "password required").
+					Check(is.MinLength(8)("weak123"), "password too short").
+					Check(is.Match(`[A-Z]`)("weak123"), "needs uppercase")
 			},
 			expect: func(t *testing.T) {
 				assert.True(t, v.HasErrorFor("password"))
@@ -197,7 +198,7 @@ func TestValidator_ValidationChaining(t *testing.T) {
 				v.Clear()
 				v.Group("user").
 					Field("email", "invalid").
-					Check(datacop.Email("invalid"), "invalid email")
+					Check(is.Email("invalid"), "invalid email")
 			},
 			expect: func(t *testing.T) {
 				assert.True(t, v.HasErrorFor("user.email"))
@@ -249,8 +250,8 @@ func TestFieldValidation(t *testing.T) {
 			value: "johndoe",
 			validations: func(v *datacop.Validator) {
 				v.Field("username", "johndoe").
-					Check(datacop.Required("johndoe"), "username required").
-					Check(datacop.MinLength(3)("johndoe"), "username too short")
+					Check(is.Required("johndoe"), "username required").
+					Check(is.MinLength(3)("johndoe"), "username too short")
 			},
 			expectErrors: false,
 		},
@@ -260,8 +261,8 @@ func TestFieldValidation(t *testing.T) {
 			value: "weak",
 			validations: func(v *datacop.Validator) {
 				v.Field("password", "weak").
-					Check(datacop.MinLength(8)("weak"), "password too short").
-					Check(datacop.Match(`[A-Z]`)("weak"), "must contain uppercase")
+					Check(is.MinLength(8)("weak"), "password too short").
+					Check(is.Match(`[A-Z]`)("weak"), "must contain uppercase")
 			},
 			expectErrors:  true,
 			expectedError: "password: [password too short, must contain uppercase]",
@@ -272,8 +273,8 @@ func TestFieldValidation(t *testing.T) {
 			value: "test@example.com",
 			validations: func(v *datacop.Validator) {
 				v.Field("email", "test@example.com").
-					Check(datacop.Required("test@example.com"), "email required").
-					Check(datacop.Email("test@example.com"), "invalid email format")
+					Check(is.Required("test@example.com"), "email required").
+					Check(is.Email("test@example.com"), "invalid email format")
 			},
 			expectErrors: false,
 		},
@@ -310,11 +311,11 @@ func TestGroupValidation(t *testing.T) {
 			validations: func(v *datacop.Validator) {
 				userGroup := v.Group("user")
 				userGroup.Field("name", "John Doe").
-					Check(datacop.Required("John Doe"), "name required")
+					Check(is.Required("John Doe"), "name required")
 
 				addressGroup := v.Group("address")
 				addressGroup.Field("street", "123 Main St").
-					Check(datacop.Required("123 Main St"), "street required")
+					Check(is.Required("123 Main St"), "street required")
 			},
 			expectErrors: false,
 		},
@@ -323,11 +324,11 @@ func TestGroupValidation(t *testing.T) {
 			validations: func(v *datacop.Validator) {
 				userGroup := v.Group("user")
 				userGroup.Field("name", "").
-					Check(datacop.Required(""), "name required")
+					Check(is.Required(""), "name required")
 
 				addressGroup := v.Group("address")
 				addressGroup.Field("street", "").
-					Check(datacop.Required(""), "street required")
+					Check(is.Required(""), "street required")
 			},
 			expectErrors: true,
 			//expectedError: "user.name: [name required] | address.street: [street required]",
@@ -364,9 +365,9 @@ func TestWhenValidation(t *testing.T) {
 			validations: func(v *datacop.Validator) {
 				v.Field("role", "").
 					When(true).
-					Check(datacop.Required(""), "role required").
+					Check(is.Required(""), "role required").
 					When(true).
-					Check(datacop.In("admin", "user")(""), "invalid role")
+					Check(is.In("admin", "user")(""), "invalid role")
 			},
 			expectErrors:  true,
 			expectedError: "role: [role required, invalid role]",
@@ -376,9 +377,9 @@ func TestWhenValidation(t *testing.T) {
 			validations: func(v *datacop.Validator) {
 				v.Field("role", "").
 					When(false).
-					Check(datacop.Required(""), "role required").
+					Check(is.Required(""), "role required").
 					When(true).
-					Check(datacop.In("admin", "user")(""), "invalid role")
+					Check(is.In("admin", "user")(""), "invalid role")
 			},
 			expectErrors: false,
 		},
@@ -387,10 +388,10 @@ func TestWhenValidation(t *testing.T) {
 			validations: func(v *datacop.Validator) {
 				v.Field("role", "admin").
 					When(true).
-					Check(datacop.Required("admin"), "role required").
-					Check(datacop.MinLength(3)("admin"), "role too short").
+					Check(is.Required("admin"), "role required").
+					Check(is.MinLength(3)("admin"), "role too short").
 					When(true).
-					Check(datacop.In("admin", "user")("admin"), "invalid role")
+					Check(is.In("admin", "user")("admin"), "invalid role")
 			},
 			expectErrors: false,
 		},
@@ -400,8 +401,8 @@ func TestWhenValidation(t *testing.T) {
 				v.Field("role", "").
 					When(true).
 					When(false).
-					Check(datacop.Required(""), "role required").
-					Check(datacop.In("admin", "user")(""), "invalid role")
+					Check(is.Required(""), "role required").
+					Check(is.In("admin", "user")(""), "invalid role")
 			},
 			expectErrors: false,
 		},
@@ -409,9 +410,9 @@ func TestWhenValidation(t *testing.T) {
 			name: "chain: Check-When-Check (When affects only following check)",
 			validations: func(v *datacop.Validator) {
 				v.Field("role", "").
-					Check(datacop.Required(""), "role required").
+					Check(is.Required(""), "role required").
 					When(false).
-					Check(datacop.In("admin", "user")(""), "invalid role")
+					Check(is.In("admin", "user")(""), "invalid role")
 			},
 			expectErrors:  true,
 			expectedError: "role: [role required]",
@@ -421,11 +422,11 @@ func TestWhenValidation(t *testing.T) {
 			validations: func(v *datacop.Validator) {
 				v.Field("role", "admin").
 					When(true).
-					Check(datacop.Required("admin"), "role required").
+					Check(is.Required("admin"), "role required").
 					When(false).
-					Check(datacop.MinLength(10)("admin"), "role too short"). // should be skipped
+					Check(is.MinLength(10)("admin"), "role too short"). // should be skipped
 					When(true).
-					Check(datacop.In("admin", "user")("admin"), "invalid role")
+					Check(is.In("admin", "user")("admin"), "invalid role")
 			},
 			expectErrors: false,
 		},

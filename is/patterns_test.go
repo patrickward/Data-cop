@@ -1,11 +1,11 @@
-package datacop_test
+package is_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/patrickward/datacop"
+	"github.com/patrickward/datacop/is"
 )
 
 func TestPassword(t *testing.T) {
@@ -24,7 +24,7 @@ func TestPassword(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, datacop.Password(tt.value))
+			assert.Equal(t, tt.want, is.Password(tt.value))
 		})
 	}
 }
@@ -44,7 +44,7 @@ func TestUsername(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, datacop.Username(tt.value))
+			assert.Equal(t, tt.want, is.Username(tt.value))
 		})
 	}
 }

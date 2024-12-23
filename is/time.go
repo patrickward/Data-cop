@@ -1,9 +1,13 @@
-package datacop
+package is
 
-import "time"
+import (
+	"time"
+
+	"github.com/patrickward/datacop"
+)
 
 // Before checks if a time is before another
-func Before(t time.Time) ValidationFunc {
+func Before(t time.Time) datacop.ValidationFunc {
 	return func(value any) bool {
 		v, ok := value.(time.Time)
 		if !ok {
@@ -14,7 +18,7 @@ func Before(t time.Time) ValidationFunc {
 }
 
 // After checks if a time is after another
-func After(t time.Time) ValidationFunc {
+func After(t time.Time) datacop.ValidationFunc {
 	return func(value any) bool {
 		v, ok := value.(time.Time)
 		if !ok {
@@ -29,7 +33,7 @@ func After(t time.Time) ValidationFunc {
 // Example usage:
 // BetweenTime(time.Now().Add(-1*time.Hour), time.Now().Add(1*time.Hour))(time.Now()) // returns true
 // BetweenTime(time.Now().Add(-1*time.Hour), time.Now().Add(-30*time.Minute))(time.Now()) // returns false
-func BetweenTime(start, end time.Time) ValidationFunc {
+func BetweenTime(start, end time.Time) datacop.ValidationFunc {
 	return func(value any) bool {
 		v, ok := value.(time.Time)
 		if !ok {

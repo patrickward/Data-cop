@@ -1,10 +1,12 @@
-package datacop
+package is
 
 import (
 	"reflect"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/patrickward/datacop"
 )
 
 // Required checks if a value is non-empty
@@ -56,7 +58,7 @@ func NotZero[T comparable](value T) bool {
 // Example usage:
 // Match(`^[a-zA-Z0-9]+$`)(username) // returns true if username is alphanumeric
 // Match(`^[a-zA-Z0-9]+$`)(email) // returns false if email is not alphanumeric
-func Match(pattern string) ValidationFunc {
+func Match(pattern string) datacop.ValidationFunc {
 	regex := regexp.MustCompile(pattern)
 	return func(value any) bool {
 		str, ok := value.(string)

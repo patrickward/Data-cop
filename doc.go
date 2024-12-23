@@ -44,16 +44,16 @@ For more complex validations, use the fluent Field builder:
 
 	// Chain validations for username
 	v.Field("username", username).
-		Check(Required(username), "username is required").
-		Check(MinLength(3)(username), "username too short").
-		Check(MaxLength(255)(username), "username too long")
+		Check(is.Required(username), "username is required").
+		Check(is.MinLength(3)(username), "username too short").
+		Check(is.MaxLength(255)(username), "username too long")
 
 	// Chain validations for password
 	v.Field("password", password).
-		Check(Required(password), "password is required").
-		Check(MinLength(8)(password), "password too short").
-		Check(Match(`[A-Z]`)(password), "must contain uppercase").
-		Check(Match(`[0-9]`)(password), "must contain number")
+		Check(is.Required(password), "password is required").
+		Check(is.MinLength(8)(password), "password too short").
+		Check(is.Match(`[A-Z]`)(password), "must contain uppercase").
+		Check(is.Match(`[0-9]`)(password), "must contain number")
 
 # Grouped Validation
 
@@ -64,16 +64,16 @@ For nested structures, use Group to namespace validations:
 	// Validate user details group
 	userGroup := v.Group("user")
 	userGroup.Field("name", name).
-		Check(Required(name), "name is required")
+		Check(is.Required(name), "name is required")
 	userGroup.Field("age", age).
-		Check(Min(18)(age), "must be 18 or older")
+		Check(is.Min(18)(age), "must be 18 or older")
 
 	// Validate address group
 	addrGroup := v.Group("address")
 	addrGroup.Field("street", street).
-		Check(Required(street), "street is required")
+		Check(is.Required(street), "street is required")
 	addrGroup.Field("city", city).
-		Check(Required(city), "city is required")
+		Check(is.Required(city), "city is required")
 
 # Conditional Validation
 
@@ -84,21 +84,21 @@ Conditional validations using When are evaluated sequentially. When a condition 
 	// Check is skipped because When(false)
 	v.Field("company", company).
 		When(false).
-		Check(Required(company), "company required")
+		Check(is.Required(company), "company required")
 
 	// Multiple conditions
 	v.Field("role", role).
-		Check(Required(role), "role is required").     // Always runs
+		Check(is.Required(role), "role is required").     // Always runs
 		When(isAdmin).                                 // Only if isAdmin is true
-		Check(In("admin", "super")(), "invalid role"). //   will this check run
+		Check(is.In("admin", "super")(), "invalid role"). //   will this check run
 		When(hasPermission).                           // Only if hasPermission is true
-		Check(NotZero(), "permission required")        //   will this check run
+		Check(is.NotZero(), "permission required")        //   will this check run
 
 	// When conditions are combined with AND logic
 	v.Field("department", dept).
 		When(isEmployee).
 		When(isFullTime).
-		Check(Required(dept), "department required")    // Runs only if isEmployee AND isFullTime
+		Check(is.Required(dept), "department required")    // Runs only if isEmployee AND isFullTime
 
 Note: Each When condition affects only the Check calls that follow it, until another When is encountered. The validation chain is processed sequentially from left to right.
 
@@ -150,17 +150,37 @@ Creating custom validation functions is straightforward - any function that retu
 
 The package provides many built-in validation functions:
 
-	Required(value)              // checks if value is non-empty
-	MinLength(5)(value)         // minimum length
-	MaxLength(10)(value)        // maximum length
-	Email(value)                // email format
-	Phone(value)                // phone number format
-	Match(`[0-9]+`)(value)     // regex pattern
-	Between(1, 100)(value)      // numeric range
-	Min(18)(value)              // minimum value
-	Max(65)(value)              // maximum value
-	In("a", "b", "c")(value)   // value in set
-	NoDuplicates()([]string{})  // unique values in slice
+		// Basic validations
+		is.Required(value)              // checks if value is non-empty
+	 	is.NotZero(value)               // checks if numeric value is not zero
+		is.Match(`[a-zA-Z0-9]+`)(value) // regex pattern
+
+		// Comparison validations
+
+		is.Between(1, 100)(value)      // numeric range
+		is.Equal(10)(value)            // equal to value
+		is.EqualStrings("a", "b")      // equal strings
+		is.In("a", "b", "c")(value)   // value in set
+		is.AllIn("a", "b", "c")([]string{"a", "b"}) // all values in set
+		is.NoDuplicates()([]string{})  // unique values in slice
+		is.Min(18)(value)              // minimum value
+		is.Max(65)(value)              // maximum value
+		is.MinLength(5)(value)         // minimum length
+		is.MaxLength(10)(value)        // maximum length
+		is.GreaterThan(100)(value)     // greater than value
+		is.LessThan(100)(value)        // less than value
+		is.GreaterOrEqual(100)(value)  // greater or equal to value
+		is.LessOrEqual(100)(value)     // less or equal to value
+
+		// Time-based validations
+
+		is.Before(time.Now())          // time before now
+		is.After(time.Now())           // time after now
+		is.BetweenTime(start, end)     // time between two values
+
+		// String regex validations
+		is.Email(value)                // email format
+		is.Phone(value)                // phone number format
 
 # Error Handling
 
@@ -180,11 +200,11 @@ Password validation example:
 
 	v := datacop.New()
 	v.Field("password", password).
-		Check(Required(password), "password is required").
-		Check(MinLength(8)(password), "password too short").
-		Check(Match(`[A-Z]`)(password), "must contain uppercase").
-		Check(Match(`[a-z]`)(password), "must contain lowercase").
-		Check(Match(`[0-9]`)(password), "must contain number")
+		Check(is.Required(password), "password is required").
+		Check(is.MinLength(8)(password), "password too short").
+		Check(is.Match(`[A-Z]`)(password), "must contain uppercase").
+		Check(is.Match(`[a-z]`)(password), "must contain lowercase").
+		Check(is.Match(`[0-9]`)(password), "must contain number")
 
 Form validation example:
 
@@ -198,15 +218,15 @@ Form validation example:
 		v := datacop.New()
 
 		v.Field("username", form.Username).
-			Check(Required(form.Username), "username is required").
-			Check(MinLength(3)(form.Username), "username too short")
+			Check(is.Required(form.Username), "username is required").
+			Check(is.MinLength(3)(form.Username), "username too short")
 
 		v.Field("email", form.Email).
-			Check(Required(form.Email), "email is required").
-			Check(Email(form.Email), "invalid email format")
+			Check(is.Required(form.Email), "email is required").
+			Check(is.Email(form.Email), "invalid email format")
 
 		v.Field("age", form.Age).
-			Check(Min(18)(form.Age), "must be 18 or older")
+			Check(is.Min(18)(form.Age), "must be 18 or older")
 
 		if v.HasErrors() {
 			return v

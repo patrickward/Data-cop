@@ -36,13 +36,13 @@ func main() {
     
     // Simple field validation
     username := "john"
-    v.Check(datacop.Required(username), "username", "username is required")
+    v.Check(is.Required(username), "username", "username is required")
     
     // Chainable validation
     email := "invalid-email"
     v.Field("email", email).
-        Check(datacop.Required(email), "email is required").
-        Check(datacop.Email(email), "invalid email format")
+        Check(is.Required(email), "email is required").
+        Check(is.Email(email), "invalid email format")
     
     if v.HasErrors() {
         fmt.Println(v.Errors())
@@ -70,27 +70,27 @@ See the [package documentation](https://pkg.go.dev/github.com/patrickward/dataco
 v := datacop.New()
 
 // Explicit checks 
-v.Check(datacop.Required(username), "username is required")
-v.Check(datacop.Email(email), "invalid email format")
-v.CheckStandalone(datacop.Min(18)(age), "must be 18 or older")
+v.Check(is.Required(username), "username is required")
+v.Check(is.Email(email), "invalid email format")
+v.CheckStandalone(is.Min(18)(age), "must be 18 or older")
 
 // Password validation
 v.Field("password", password).
-    Check(datacop.Required(password), "password is required").
-    Check(datacop.MinLength(8)(password), "password too short").
-    Check(datacop.Match(`[A-Z]`)(password), "must contain uppercase").
-    Check(datacop.Match(`[a-z]`)(password), "must contain lowercase").
-    Check(datacop.Match(`[0-9]`)(password), "must contain number")
+    Check(is.Required(password), "password is required").
+    Check(is.MinLength(8)(password), "password too short").
+    Check(is.Match(`[A-Z]`)(password), "must contain uppercase").
+    Check(is.Match(`[a-z]`)(password), "must contain lowercase").
+    Check(is.Match(`[0-9]`)(password), "must contain number")
 
 // Grouped validation
 userGroup := v.Group("user")
 userGroup.Field("name", name).
-    Check(datacop.Required(name), "name is required")
+    Check(is.Required(name), "name is required")
 userGroup.Field("age", age).
-    Check(datacop.Min(18)(age), "must be 18 or older")
+    Check(is.Min(18)(age), "must be 18 or older")
 
 // Conditional validation
 v.Field("company", company).
     When(isEmployed).
-    Check(datacop.Required(company), "company required")
+    Check(is.Required(company), "company required")
 ```

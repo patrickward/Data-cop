@@ -1,4 +1,4 @@
-package datacop
+package is
 
 // Password returns common password validation rules.
 // This is an example of a function that could be used in a project's own validation library,

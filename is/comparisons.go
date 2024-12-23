@@ -1,4 +1,4 @@
-package datacop
+package is
 
 import (
 	"cmp"
@@ -6,6 +6,8 @@ import (
 	"unicode/utf8"
 
 	"golang.org/x/exp/constraints"
+
+	"github.com/patrickward/datacop"
 )
 
 // Between checks if a value is between a minimum and maximum value
@@ -13,7 +15,7 @@ import (
 //
 // Between(10, 20)(15) // returns true
 // Between(10, 20)(25) // returns false
-func Between[T constraints.Ordered](min, max T) ValidationFunc {
+func Between[T constraints.Ordered](min, max T) datacop.ValidationFunc {
 	return func(value any) bool {
 		v, ok := value.(T)
 		if !ok {
@@ -27,7 +29,7 @@ func Between[T constraints.Ordered](min, max T) ValidationFunc {
 // Example usage:
 // Equal(10)(10) // returns true
 // Equal(10)(5) // returns false
-func Equal[T comparable](other T) ValidationFunc {
+func Equal[T comparable](other T) datacop.ValidationFunc {
 	return func(value any) bool {
 		v, ok := value.(T)
 		if !ok {
@@ -53,7 +55,7 @@ func EqualStrings(value, other string) bool {
 // In(1, 2, 3)(4) // returns false
 // In("a", "b", "c")("b") // returns true
 // In("a", "b", "c")("d") // returns false
-func In[T comparable](allowed ...T) ValidationFunc {
+func In[T comparable](allowed ...T) datacop.ValidationFunc {
 	return func(value any) bool {
 		v, ok := value.(T)
 		if !ok {
@@ -75,7 +77,7 @@ func In[T comparable](allowed ...T) ValidationFunc {
 // AllIn(1, 2, 3)([]int{1, 4}) // returns false
 // AllIn("a", "b", "c")([]string{"a", "b"}) // returns true
 // AllIn("a", "b", "c")([]string{"a", "d"}) // returns false
-func AllIn[T comparable](allowed ...T) ValidationFunc {
+func AllIn[T comparable](allowed ...T) datacop.ValidationFunc {
 	return func(value any) bool {
 		values, ok := value.([]T)
 		if !ok {
@@ -102,7 +104,7 @@ func AllIn[T comparable](allowed ...T) ValidationFunc {
 // Example usage:
 // NoDuplicates()([]int{1, 2, 3}) // returns true
 // NoDuplicates()([]int{1, 2, 2}) // returns false
-func NoDuplicates[T comparable]() ValidationFunc {
+func NoDuplicates[T comparable]() datacop.ValidationFunc {
 	return func(value any) bool {
 		values, ok := value.([]T)
 		if !ok {
@@ -125,7 +127,7 @@ func NoDuplicates[T comparable]() ValidationFunc {
 // Example usage:
 // MinLength(5)("hello") // returns true
 // MinLength(5)("hi") // returns false
-func MinLength(min int) ValidationFunc {
+func MinLength(min int) datacop.ValidationFunc {
 	return func(value any) bool {
 		str, ok := value.(string)
 		if !ok {
@@ -140,7 +142,7 @@ func MinLength(min int) ValidationFunc {
 // Example usage:
 // MaxLength(5)("hello") // returns false
 // MaxLength(5)("hi") // returns true
-func MaxLength(max int) ValidationFunc {
+func MaxLength(max int) datacop.ValidationFunc {
 	return func(value any) bool {
 		str, ok := value.(string)
 		if !ok {
@@ -155,7 +157,7 @@ func MaxLength(max int) ValidationFunc {
 // Example usage:
 // Min(10)(15) // returns true
 // Min(10)(5) // returns false
-func Min[T cmp.Ordered](min T) ValidationFunc {
+func Min[T cmp.Ordered](min T) datacop.ValidationFunc {
 	return func(value any) bool {
 		v, ok := value.(T)
 		if !ok {
@@ -170,7 +172,7 @@ func Min[T cmp.Ordered](min T) ValidationFunc {
 // Example usage:
 // Max(10)(5) // returns true
 // Max(10)(15) // returns false
-func Max[T cmp.Ordered](max T) ValidationFunc {
+func Max[T cmp.Ordered](max T) datacop.ValidationFunc {
 	return func(value any) bool {
 		v, ok := value.(T)
 		if !ok {
@@ -186,7 +188,7 @@ func Max[T cmp.Ordered](max T) ValidationFunc {
 //
 // GreaterThan(10)(15) // returns true
 // GreaterThan(10)(5) // returns false
-func GreaterThan[T cmp.Ordered](n T) ValidationFunc {
+func GreaterThan[T cmp.Ordered](n T) datacop.ValidationFunc {
 	return func(value any) bool {
 		v, ok := value.(T)
 		if !ok {
@@ -201,7 +203,7 @@ func GreaterThan[T cmp.Ordered](n T) ValidationFunc {
 // Example usage:
 // LessThan(10)(5) // returns true
 // LessThan(10)(15) // returns false
-func LessThan[T cmp.Ordered](n T) ValidationFunc {
+func LessThan[T cmp.Ordered](n T) datacop.ValidationFunc {
 	return func(value any) bool {
 		v, ok := value.(T)
 		if !ok {
@@ -217,7 +219,7 @@ func LessThan[T cmp.Ordered](n T) ValidationFunc {
 // GreaterOrEqual(10)(15) // returns true
 // GreaterOrEqual(10)(10) // returns true
 // GreaterOrEqual(10)(5) // returns false
-func GreaterOrEqual[T cmp.Ordered](n T) ValidationFunc {
+func GreaterOrEqual[T cmp.Ordered](n T) datacop.ValidationFunc {
 	return func(value any) bool {
 		v, ok := value.(T)
 		if !ok {
@@ -233,7 +235,7 @@ func GreaterOrEqual[T cmp.Ordered](n T) ValidationFunc {
 // LessOrEqual(10)(5) // returns true
 // LessOrEqual(10)(10) // returns true
 // LessOrEqual(10)(15) // returns false
-func LessOrEqual[T cmp.Ordered](n T) ValidationFunc {
+func LessOrEqual[T cmp.Ordered](n T) datacop.ValidationFunc {
 	return func(value any) bool {
 		v, ok := value.(T)
 		if !ok {

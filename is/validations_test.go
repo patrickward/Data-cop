@@ -1,4 +1,4 @@
-package datacop_test
+package is_test
 
 import (
 	"testing"
@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/patrickward/datacop"
+	"github.com/patrickward/datacop/is"
 )
 
 func TestRequired(t *testing.T) {
@@ -26,7 +26,7 @@ func TestRequired(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, datacop.Required(tt.value))
+			assert.Equal(t, tt.want, is.Required(tt.value))
 		})
 	}
 }
@@ -43,7 +43,7 @@ func TestNotZero(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, datacop.NotZero(tt.value))
+			assert.Equal(t, tt.want, is.NotZero(tt.value))
 		})
 	}
 }
@@ -61,7 +61,7 @@ func TestMatch(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, datacop.Match(tt.pattern)(tt.value))
+			assert.Equal(t, tt.want, is.Match(tt.pattern)(tt.value))
 		})
 	}
 }
