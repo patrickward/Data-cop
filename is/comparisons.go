@@ -152,6 +152,22 @@ func MaxLength(max int) datacop.ValidationFunc {
 	}
 }
 
+// EqualLength returns a validation function that checks if a string has a specific length
+//
+// Example usage:
+// EqualLength(5)("hello") // returns true
+// EqualLength(5)("hi") // returns false
+// EqualLength(5)("hello!") // returns false
+func EqualLength(length int) datacop.ValidationFunc {
+	return func(value any) bool {
+		str, ok := value.(string)
+		if !ok {
+			return false
+		}
+		return utf8.RuneCountInString(strings.TrimSpace(str)) == length
+	}
+}
+
 // Min returns a validation function that checks minimum value
 //
 // Example usage:
